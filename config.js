@@ -10,7 +10,7 @@ window.CONFIG = {
   enlaces: {
     // Pon aquí la URL donde publiques la presentación (por ejemplo GitHub Pages).
     // Mientras esté vacío, el QR de memorias aparece como pendiente.
-    memorias: "",
+    memorias: "https://pascual890.github.io/U5-simulacion/",
     redes: "https://www.instagram.com/centrodeeventosupb/",
   },
 

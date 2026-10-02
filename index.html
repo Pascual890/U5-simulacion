@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Relevo generacional | Fórum UPB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="escenario" id="escenario">
+      <!-- Capa 1: fotos. Hay dos marcos para poder hacer fundido cruzado entre momentos. -->
+      <div class="capa-fotos" aria-hidden="true">
+        <figure class="marco-foto" id="foto-a"><img alt="" /></figure>
+        <figure class="marco-foto" id="foto-b"><img alt="" /></figure>
+      </div>
+
+      <!-- Capa 1b: luz de fondo. Dos luces, una por generación, que se acercan a lo largo de la charla. -->
+      <div class="capa-luz" aria-hidden="true">
+        <div class="luz luz-experiencia"></div>
+        <div class="luz luz-jovenes"></div>
+      </div>
+
+      <!-- Capa 2: sistema de partículas (p5.js dibuja aquí, ver sketch.js). -->
+      <div class="capa-particulas" id="capa-particulas" aria-hidden="true"></div>
+
+      <!-- Capa 3: texto del guion. Se dibuja en HTML y no en el canvas para que sea legible. -->
+      <section class="capa-texto" id="capa-texto" aria-live="polite">
+        <p class="antetitulo" id="antetitulo"></p>
+        <h1 class="frase" id="frase"></h1>
+        <p class="subtitulo" id="subtitulo"></p>
+
+        <div class="qrs" id="qrs">
+          <a class="qr" id="qr-memorias" target="_blank" rel="noopener noreferrer">
+            <div class="qr-codigo"></div>
+            <span class="qr-etiqueta"></span>
+          </a>
+          <a class="qr" id="qr-redes" target="_blank" rel="noopener noreferrer">
+            <div class="qr-codigo"></div>
+            <span class="qr-etiqueta"></span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Capa 4: marca (obligatoria según el cliente). -->
+      <header class="marca">
+        <img class="logo-forum" src="./assets/logos/forum.png" alt="UPB Fórum Centro de Eventos" />
+        <img class="logo-90" src="./assets/logos/upb-90.png" alt="UPB 90 años" />
+      </header>
+
+      <!-- Capa 5: interfaz del operador. -->
+      <nav class="operador" aria-label="Controles">
+        <span class="contador" id="contador">01 / 13</span>
+      </nav>
+      <div class="ayuda" id="ayuda" hidden>
+        <p><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>AvPág</kbd> avanzar</p>
+        <p><kbd>←</kbd> <kbd>RePág</kbd> volver</p>
+        <p><kbd>Inicio</kbd> <kbd>Fin</kbd> primer / último momento</p>
+        <p><kbd>F</kbd> pantalla completa</p>
+        <p><kbd>L</kbd> idioma ES / PT</p>
+        <p><kbd>H</kbd> mostrar / ocultar esta ayuda</p>
+      </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+    <script src="./config.js"></script>
+    <script src="./momentos.js"></script>
+    <script src="./fisica.js"></script>
+    <script src="./escenas/comun.js"></script>
+    <script src="./escenas/base.js"></script>
+    <script src="./escenas/potencial.js"></script>
+    <script src="./escenas/grados.js"></script>
+    <script src="./escenas/encuentro.js"></script>
+    <script src="./escenas/triada.js"></script>
+    <script src="./escenas/comunidad.js"></script>
+    <script src="./escenas/confianza.js"></script>
+    <script src="./escenas/rutas.js"></script>
+    <script src="./escenas/generaciones.js"></script>
+    <script src="./escenas/presente.js"></script>
+    <script src="./escenas/puente.js"></script>
+    <script src="./sketch.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

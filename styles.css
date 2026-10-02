@@ -1,0 +1,454 @@
+/* ---------- Tokens ---------- */
+
+:root {
+  --fondo: #0b0b0c;
+  --tinta: #f4f1ea; /* mismo crema de los logos de Fórum */
+  --tinta-suave: rgba(244, 241, 234, 0.62);
+
+  --margen-x: 6vw;
+  --margen-y: 7vh;
+
+  --fuente: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Tamaños pensados para pantalla grande: escalan con el lado más corto. */
+  --t-frase: clamp(2.4rem, min(5.8vw, 10.5vh), 10rem);
+  --t-frase-larga: clamp(2.1rem, min(4.5vw, 8.3vh), 7.6rem);
+  --t-portada: clamp(3rem, min(6.6vw, 11.8vh), 11.4rem);
+  --t-pequeno: clamp(1rem, min(1.5vw, 2.65vh), 2rem);
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--fuente);
+  overflow: hidden;
+}
+
+.escenario {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  --progreso: 0; /* avance de la charla, de 0 (portada) a 1 (cierre); lo pone main.js */
+}
+
+.escenario.sin-cursor {
+  cursor: none;
+}
+
+/* ---------- Capa 1: fotos ---------- */
+
+.capa-fotos {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.marco-foto {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 1.1s var(--ease);
+}
+
+.marco-foto.visible {
+  opacity: 1;
+}
+
+.marco-foto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Modo "fondo": ocupa todo, oscurecida para que el texto y las partículas se lean encima. */
+.marco-foto[data-modo="fondo"] {
+  inset: 0;
+}
+
+/* Las fotos quedan detrás del sistema de partículas: oscuras y poco saturadas,
+   para que la estructura y el texto se lean encima. */
+.marco-foto[data-modo="fondo"] img {
+  filter: saturate(0.5) brightness(0.32);
+}
+
+.marco-foto[data-modo="fondo"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(11, 11, 12, 0.82) 0%, rgba(11, 11, 12, 0.45) 50%, rgba(11, 11, 12, 0.3) 100%),
+    linear-gradient(0deg, rgba(11, 11, 12, 0.6) 0%, transparent 30%);
+}
+
+/* Modo "lateral": recuadro a la derecha. Sirve para fotos verticales, que en
+   modo fondo perderían casi toda la imagen al recortarse a 16:9. */
+.marco-foto[data-modo="lateral"] {
+  top: 21vh; /* deja libre la franja de los logos */
+  right: var(--margen-x);
+  height: 68vh;
+  aspect-ratio: 3 / 4;
+}
+
+/* ---------- Capa 1b: luz de fondo ---------- */
+
+/* Dos luces muy tenues, una por generación: la experiencia (blanca, desde la
+   izquierda, la orilla desde donde construye el puente del momento 12) y las
+   nuevas generaciones (el degradado del logo de la UPB, desde la derecha). En la portada
+   apenas asoman por los bordes; momento a momento se acercan, y en el cierre se
+   funden en una sola luz. Va sobre las fotos, sumando luz (screen). */
+.capa-luz {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 1.1s var(--ease);
+}
+
+/* Sobre una foto la luz es más tenue: la foto ya da el ambiente. */
+.escenario:has(.marco-foto.visible) .capa-luz {
+  opacity: 0.55;
+}
+
+.luz {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: 72vmax;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  transition:
+    transform 3s var(--ease),
+    opacity 3s var(--ease);
+}
+
+/* Al abrir la presentación (o un momento directo con #n) las luces aparecen ya
+   en su lugar; solo se desplazan al cambiar de momento. */
+.escenario.inicio .luz {
+  transition: none;
+}
+
+/* Degradados con muchas paradas para que la luz se apague sin dejar un borde. */
+.luz-experiencia {
+  background: radial-gradient(
+    closest-side,
+    rgba(244, 241, 234, 0.3),
+    rgba(244, 241, 234, 0.18) 25%,
+    rgba(244, 241, 234, 0.07) 50%,
+    rgba(244, 241, 234, 0.02) 75%,
+    rgba(244, 241, 234, 0) 100%
+  );
+  transform: translateX(calc((var(--progreso) * 0.56 - 0.62) * 100vw)) scale(calc(0.8 + 0.35 * var(--progreso)));
+  opacity: calc(0.55 + 0.45 * var(--progreso));
+}
+
+.luz-jovenes {
+  background: radial-gradient(
+    closest-side,
+    rgba(240, 20, 110, 0.34),
+    rgba(218, 34, 160, 0.19) 25%,
+    rgba(178, 66, 252, 0.08) 50%,
+    rgba(178, 66, 252, 0.022) 75%,
+    rgba(178, 66, 252, 0) 100%
+  );
+  transform: translateX(calc((0.62 - var(--progreso) * 0.56) * 100vw)) scale(calc(0.8 + 0.35 * var(--progreso)));
+  opacity: calc(0.55 + 0.45 * var(--progreso));
+}
+
+/* ---------- Capa 2: partículas ---------- */
+
+.capa-particulas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.capa-particulas canvas {
+  display: block;
+}
+
+/* ---------- Capa 3: texto ---------- */
+
+.capa-texto {
+  position: absolute;
+  z-index: 3;
+  left: var(--margen-x);
+  top: 50%;
+  translate: 0 -50%;
+  width: min(64vw, 1500px);
+  transition:
+    opacity 0.45s var(--ease),
+    transform 0.45s var(--ease);
+}
+
+.capa-texto.saliendo {
+  opacity: 0;
+  transform: translateY(1.2vh);
+}
+
+/* Si hay foto lateral, el texto no puede invadir su columna. */
+.escenario:has(.marco-foto.visible[data-modo="lateral"]) .capa-texto {
+  width: min(52vw, 1200px);
+}
+
+.antetitulo,
+.subtitulo {
+  font-size: var(--t-pequeno);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+.antetitulo:empty,
+.subtitulo:empty {
+  display: none;
+}
+
+.antetitulo {
+  margin-bottom: 2.4vh;
+}
+
+.subtitulo {
+  margin-top: 3.2vh;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.frase {
+  font-size: var(--t-frase);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.capa-texto.es-larga .frase {
+  font-size: var(--t-frase-larga);
+}
+
+.frase .linea {
+  display: block;
+  transition: opacity 0.7s var(--ease);
+}
+
+.frase .linea.oculta {
+  opacity: 0;
+}
+
+/* Momentos con escena de partículas: el texto ocupa la columna izquierda y
+   deja la derecha para la estructura. */
+.escenario[data-escena] .capa-texto {
+  width: min(40vw, 960px);
+}
+
+/* La portada necesita más ancho para el título en mayúsculas. */
+.escenario[data-tipo="portada"][data-escena] .capa-texto {
+  width: min(58vw, 1300px);
+}
+
+.escenario[data-escena] .capa-texto.es-larga .frase {
+  font-size: clamp(1.9rem, min(3.8vw, 6.8vh), 6.3rem);
+}
+
+.frase .linea + .linea {
+  margin-top: 0.35em;
+}
+
+/* La portada es alta: se centra un poco más abajo para no tocar los logos. */
+.capa-texto[data-tipo="portada"] {
+  top: 54%;
+}
+
+/* Portada: título en mayúsculas, más grande. */
+.capa-texto[data-tipo="portada"] .frase {
+  font-size: var(--t-portada);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.capa-texto[data-tipo="portada"] .frase .linea + .linea {
+  margin-top: 0.15em;
+  font-weight: 500;
+}
+
+/* ---------- Cierre: QR ---------- */
+
+.qrs {
+  display: none;
+  gap: 3vw;
+  margin-top: 5vh;
+}
+
+.capa-texto[data-tipo="cierre"] .qrs {
+  display: flex;
+}
+
+.qr {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4vh;
+  color: var(--tinta);
+  text-decoration: none;
+}
+
+.qr-codigo {
+  width: min(15vw, 26vh);
+  aspect-ratio: 1;
+  background: var(--tinta);
+  color: var(--fondo);
+}
+
+.qr-codigo svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.qr.pendiente .qr-codigo {
+  display: grid;
+  place-items: center;
+  padding: 1em;
+  background: transparent;
+  border: 2px dashed var(--tinta-suave);
+  color: var(--tinta-suave);
+  font-size: var(--t-pequeno);
+  text-align: center;
+}
+
+.qr-etiqueta {
+  font-size: var(--t-pequeno);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Capa 4: marca ---------- */
+
+.marca {
+  position: absolute;
+  z-index: 4;
+  inset: var(--margen-y) var(--margen-x) auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.logo-forum {
+  height: clamp(28px, min(3.4vw, 6vh), 70px);
+  transition: height 0.8s var(--ease);
+}
+
+.logo-90 {
+  height: clamp(52px, min(6vw, 10.6vh), 124px);
+  transition: height 0.8s var(--ease);
+}
+
+/* En portada y cierre la marca crece: abre y cierra la charla. */
+.escenario[data-tipo="portada"] .logo-forum,
+.escenario[data-tipo="cierre"] .logo-forum {
+  height: clamp(36px, min(4.6vw, 8.2vh), 96px);
+}
+
+.escenario[data-tipo="portada"] .logo-90,
+.escenario[data-tipo="cierre"] .logo-90 {
+  height: clamp(70px, min(8vw, 14.4vh), 168px);
+}
+
+/* ---------- Capa 5: operador ---------- */
+
+.operador {
+  position: absolute;
+  z-index: 5;
+  right: var(--margen-x);
+  bottom: calc(var(--margen-y) * 0.7);
+}
+
+.contador {
+  font-size: var(--t-pequeno);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+  color: var(--tinta-suave);
+}
+
+.ayuda {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: calc(var(--margen-y) * 0.7);
+  translate: -50% 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6em 2em;
+  max-width: 80vw;
+  padding: 1em 1.6em;
+  background: rgba(11, 11, 12, 0.85);
+  border: 1px solid rgba(244, 241, 234, 0.2);
+  font-size: var(--t-pequeno);
+  color: var(--tinta-suave);
+}
+
+.ayuda[hidden] {
+  display: none;
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.05em 0.45em;
+  border: 1px solid rgba(244, 241, 234, 0.4);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.9em;
+  color: var(--tinta);
+}
+
+/* ---------- Pantallas angostas (celular en vertical) ---------- */
+
+@media (max-aspect-ratio: 1 / 1) {
+  :root {
+    --t-frase: clamp(1.6rem, 7.4vw, 3rem);
+    --t-frase-larga: clamp(1.4rem, 6.2vw, 2.6rem);
+    --t-portada: clamp(1.9rem, 8.6vw, 3.4rem);
+    --t-pequeno: clamp(0.75rem, 3vw, 1rem);
+  }
+
+  .capa-texto,
+  .escenario:has(.marco-foto.visible[data-modo="lateral"]) .capa-texto,
+  .escenario[data-escena] .capa-texto,
+  .escenario[data-tipo="portada"][data-escena] .capa-texto {
+    width: calc(100vw - 2 * var(--margen-x));
+    top: auto;
+    bottom: 12vh;
+    translate: none;
+  }
+
+  .escenario[data-escena] .capa-texto.es-larga .frase {
+    font-size: var(--t-frase-larga);
+  }
+
+  .marco-foto[data-modo="lateral"] {
+    top: 14vh;
+    left: var(--margen-x);
+    right: var(--margen-x);
+    height: 38vh;
+    aspect-ratio: auto;
+    translate: none;
+  }
+
+  .qr-codigo {
+    width: 34vw;
+  }
+}
